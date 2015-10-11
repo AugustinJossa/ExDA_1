@@ -1,0 +1,36 @@
+## reading and preparing data
+Sys.setlocale("LC_TIME", "C")
+elect <- read.table("household_power_consumption.txt", sep = ";", header = T)
+elect$Date <- strptime(elect$Date, format = "%d/%m/%Y")
+elect$Date <- as.Date(elect$Date)
+cn <- subset(elect, elect$Date ==  "2007-02-01")
+cr <- subset(elect, elect$Date == "2007-02-02")
+elect2 <- rbind(cn,cr)
+elect2$datetime <- paste(elect2$Date, elect2$Time, sep = " ")
+elect2$datetime <- strptime(elect2$datetime, format = "%Y-%m-%d %H:%M:%S")
+elect2$Sub_metering_1<- as.numeric(as.character(elect2$Sub_metering_1))
+elect2$Sub_metering_2<- as.numeric(as.character(elect2$Sub_metering_2))
+elect2$Sub_metering_3<- as.numeric(as.character(elect2$Sub_metering_3))
+elect2$Global_active_power <- as.numeric(as.character(elect2$Global_active_power))
+elect2$Voltage <- as.numeric(as.character(elect2$Voltage))
+elect2$Global_reactive_power <- as.numeric(as.character(elect2$Global_reactive_power))
+## Fourth graph
+png(filename = "plot4.png",width = 480, height = 480, units = "px")
+par(mar = c(4,4,2,2))
+par(mfcol = c(2,2))
+## First
+plot(elect2$datetime, elect2$Global_active_power, type = "l", ylab = "Global Active Power", xlab = "")
+## Second
+plot(elect2$datetime, elect2$Sub_metering_1, type = "l", ylab = "Energy sub metering", col = "black", xlab = "")
+par(new = T)
+plot(elect2$datetime, elect2$Sub_metering_2, type = "l", ylab = "", col = "red", axes = F, ylim = c(0, max(elect2$Sub_metering_1)), xlab = "")
+par(new = T)
+plot(elect2$datetime, elect2$Sub_metering_3, type = "l", ylab = "", col = "blue", axes = F, ylim = c(0, max(elect2$Sub_metering_1)), xlab = "")
+par(new = T)
+legend("topright", legend = c("Sub_metering_1","Sub_metering_2","Sub_metering_3"), col = c("black","red","blue"), lty = "solid", cex = 0.75, bty="n")
+par( new = F)
+## Third
+plot(elect2$datetime,elect2$Voltage, type = "l", xlab = "datetime", ylab = "Voltage")
+## Fourth
+plot(elect2$datetime,elect2$Global_reactive_power, type ="l", xlab = "datetime", ylab = "Global_reactive_power")
+dev.off()
